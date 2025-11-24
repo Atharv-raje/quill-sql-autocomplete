@@ -6,6 +6,9 @@ This tool understands your database schema + question → returns 2–3 optimize
 
 
 
+## UI Preview
+
+![SQL Autocomplete UI](./frontend/public/screenshots/UI_screenshot.png)
 
 
 

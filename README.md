@@ -63,8 +63,8 @@ Multiple SQL query suggestions
 
 Clear human-friendly descriptions
 
-##  Full Stack 
- Frontend:
+
+## Frontend:
 
 Next.js (App Router)
 

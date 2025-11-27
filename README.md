@@ -1,30 +1,46 @@
-## SQL Autocomplete AI — Natural Language → SQL Query Suggestions
+[## SQL Autocomplete AI — Natural Language Autocomplete → SQL Generator
 
-A full-stack AI project that converts natural language questions into SQL queries, powered by LLMs, FastAPI, and Next.js + Tailwind.
+A full-stack AI system that provides real-time natural-language autocomplete and generates precise SQL queries.
 
-This tool understands your database schema + question → returns 2–3 optimized SQL query candidates with descriptions.
+Powered by:
 
+Next.js + Tailwind (frontend)
 
+FastAPI (backend)
+
+Groq Llama-3.3 (ultra-fast LLM)
+
+As the user types a question, the system surfaces real-time autocomplete suggestions to help complete their natural-language query—similar to Google Search or IDE autocomplete.
+
+When the user submits the final question, the model generates:
+
+one accurate SQL query
+
+with a clean natural-language explanation
+
+displayed in a full-width, polished card UI.
 
 ## UI Preview
 
 ![SQL Autocomplete UI](./frontend/public/screenshots/UI_screenshot.png)
 
+##  Live Demo
+Step 1 — Wake Backend (Render)
 
-
-## 🌐 Live Demo
-Step1:
-Backend (Render): https://quill-sql-autocomplete.onrender.com/
+🔗 Backend API (FastAPI on Render)
+https://quill-sql-autocomplete.onrender.com/
 
 ⚠️ Render free tier sleeps after inactivity.
-Open the backend URL once to wake it → then use the frontend normally.
+Open this once → backend wakes → then use the frontend normally.
 
-Step 2 :
-Frontend: [your Vercel URL]https://quill-sql-autocomplete.vercel.app/)
+Step 2 — Use Frontend
 
-## Example Schema and Question 
-SaaS / Subscription App
+🔗 Frontend (Next.js on Vercel)
+https://quill-sql-autocomplete.vercel.app/
 
+## Example Schema + Question
+
+Schema
 ```
 Table: accounts
 Columns:
@@ -41,67 +57,102 @@ Columns:
 - created_at (timestamp)
 ```
 Question
-
-```
 How many active users logged in during the last 7 days?
-```
 
 ##  Features
-✔ Natural Language → SQL Conversion
+✔ Natural Language → SQL Autocomplete
 
 Ask questions like:
 
 “How many users signed up last week?”
 
-“Show the top 3 products by revenue”
+“Show top 3 products by revenue”
 
 “List all orders where amount > 1000”
 
-The system generates:
+“What is the average profit in the last 30 days?”
 
-Multiple SQL query suggestions
+Returns:
 
-Clear human-friendly descriptions
+2–3 suggested SQL queries
 
+Clear human-readable descriptions
 
-## Frontend:
+Real-time autocomplete while typing
+
+Click-to-copy SQL card output
+
+##  Frontend (Next.js + Tailwind)
 
 Next.js (App Router)
 
-Tailwind CSS
+Beautiful glass-style UI
 
-Beautiful card UI
+Autocomplete dropdown while typing
 
 Async loading states
 
 Deployed on Vercel
 
-## Backend:
+##  Backend (FastAPI + Groq)
 
-FastAPI
+FastAPI REST API
 
-Python
+Uses Groq Llama-3.3 (very fast)
 
-Groq Llama-3.3 model
+Pydantic type-safe models
 
-CORS enabled
-
-Type-checked Pydantic schemas
+CORS enabled for Vercel + localhost
 
 Deployed on Render
 
 ##  System Architecture
-  ````
-       User Input
-            ↓
+```
+         User Input
+              ↓
    Next.js Frontend (Vercel)
-            ↓  POST /autocomplete
+              ↓   POST /autocomplete
    FastAPI Backend (Render)
-            ↓
-        Groq LLM
-            ↓
-   SQL Suggestions JSON
-            ↓
-      Frontend Cards UI
+              ↓
+            Groq LLM
+              ↓
+   JSON SQL Suggestions
+              ↓
+       UI SQL Cards
+```
+## Repository Structure
+```
+quill-sql-autocomplete/
+│
+├── backend/               # FastAPI app
+│   ├── main.py
+│   ├── llm_client.py
+│   ├── autocomplete.py
+│   ├── models.py
+│   ├── requirements.txt
+│   └── .env (Not committed)
+│
+├── frontend/              # Next.js app (Vercel)
+│   ├── app/
+│   ├── public/
+│   │   └── screenshots/
+│   │       └── UI_screenshot.png
+│   └── tailwind.config.ts
+│
+└── README.md
+```
 
-````      
+ ## 📝 Notes for Reviewers
+
+The project supports true autocomplete, similar to Google search and IDEs.
+
+Suggestions appear in real time as the user types.
+
+Final SQL query is shown in a beautiful full-width card with copy button.
+
+Backend & frontend are fully deployed — no setup required.
+
+## Credits
+
+Built by Atharv Raje
+For the SQL Autocomplete Challenge (Quill)

@@ -3,19 +3,19 @@
 import { useState, useRef, useCallback } from "react";
 
 type QueryOption = {
-  completionText: string; // what the user sees as completed question
-  sqlQuery: string;       // final SQL
+  completionText: string;
+  sqlQuery: string;
 };
 
 export default function Home() {
   const [userInput, setUserInput] = useState("");
-  const [schema, setSchema] = useState(`Table: orders
+  const [schema, setSchema] = useState(`Table: transactions
 Columns:
 - id (bigint, PK)
-- user_id (bigint)
-- total_amount (numeric)
-- profit (numeric)
-- order_date (timestamp)`);
+- account_id (bigint, FK to accounts.id)
+- amount (numeric)
+- txn_type (text) -- 'credit' or 'debit'
+- created_at (timestamp)`);
 
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<QueryOption[]>([]);
@@ -24,13 +24,13 @@ Columns:
   // inline dropdown state
   const [inlineSuggestions, setInlineSuggestions] = useState<string[]>([]);
   const [showInline, setShowInline] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ??
     "https://quill-sql-autocomplete.onrender.com/autocomplete";
 
-  // ---------- INLINE AUTOCOMPLETE (dropdown) ----------
+  // ---------------- INLINE AUTOCOMPLETE (DROPDOWN) ----------------
   const fetchInlineSuggestions = useCallback(
     async (partial: string) => {
       try {
@@ -45,13 +45,15 @@ Columns:
         });
 
         if (!res.ok) {
+          // If backend fails, hide dropdown silently
+          setShowInline(false);
           return;
         }
 
         const data = await res.json();
         const raw = Array.isArray(data.options) ? data.options : [];
 
-        const suggestions = raw
+        const suggestions: string[] = raw
           .map((opt: any) =>
             String(
               opt.completionText ??
@@ -59,13 +61,14 @@ Columns:
                 ""
             ).trim()
           )
-          .filter((s: string) => s.length > 0)
+          .filter((s) => s.length > 0)
           .slice(0, 5);
 
         setInlineSuggestions(suggestions);
         setShowInline(suggestions.length > 0);
       } catch (err) {
         console.error("Inline autocomplete error:", err);
+        setShowInline(false);
       }
     },
     [backendUrl, schema]
@@ -78,6 +81,7 @@ Columns:
     setUserInput(value);
     setError("");
 
+    // reset dropdown when input is too short
     if (!value.trim() || value.trim().length < 3) {
       setInlineSuggestions([]);
       setShowInline(false);
@@ -87,13 +91,14 @@ Columns:
       return;
     }
 
+    // debounce backend calls a little
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
       fetchInlineSuggestions(value);
-    }, 500);
+    }, 400);
   };
 
   const handleSuggestionClick = async (suggestion: string) => {
@@ -103,7 +108,7 @@ Columns:
     await submit(undefined, suggestion);
   };
 
-  // ---------- MAIN SUBMIT ----------
+  // ---------------- MAIN SUBMIT (FINAL SQL) ----------------
   const submit = async (
     e?: React.FormEvent,
     overrideQuestion?: string
@@ -122,9 +127,7 @@ Columns:
     try {
       const res = await fetch(backendUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userInput: finalQuestion,
           schemaDescription: schema,
@@ -153,7 +156,7 @@ Columns:
         }))
         .filter((o) => o.completionText && o.sqlQuery);
 
-      // only show the top option as final SQL card
+      // show ONLY the top option as the final SQL
       setOptions(normalized.slice(0, 1));
     } catch (err) {
       console.error(err);
@@ -180,9 +183,8 @@ Columns:
         <header className="header">
           <h1 className="title">Natural Language SQL Autocomplete</h1>
           <p className="subtitle">
-            Start typing a question in plain English and see autocomplete
-            suggestions in real time. Pick one and get a production-ready
-            SQL query for your schema.
+            Start typing a question in plain English and get real-time
+            autocomplete suggestions, plus a ready-to-run SQL query.
           </p>
         </header>
 
@@ -190,14 +192,12 @@ Columns:
           <form onSubmit={submit} className="form">
             {/* Question + dropdown */}
             <div className="field">
-              <label className="label">
-                Your partially typed question
-              </label>
+              <label className="label">Your partially typed question</label>
               <div className="autocompleteWrapper">
                 <textarea
                   className="input"
                   rows={2}
-                  placeholder="Example: total sum of all orders..."
+                  placeholder="Example: total amount of all debit transactions..."
                   value={userInput}
                   onChange={handleUserInputChange}
                 />

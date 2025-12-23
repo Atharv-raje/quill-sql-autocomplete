@@ -20,6 +20,7 @@ with a clean natural-language explanation
 
 displayed in a full-width, polished card UI.
 
+
 ## UI Preview
 
 ![SQL Autocomplete UI](./frontend/public/screenshots/UI_screenshot.png)

@@ -122,7 +122,7 @@ Deployed on Render
 ```
 ## Repository Structure
 ```
-quill-sql-autocomplete/
+sql-autocomplete/
 │
 ├── backend/               # FastAPI app
 │   ├── main.py
@@ -155,4 +155,4 @@ Backend & frontend are fully deployed — no setup required.
 ## Credits
 
 Built by Atharv Raje
-For the SQL Autocomplete Challenge (Quill)
+For the SQL Autocomplete Challenge 
